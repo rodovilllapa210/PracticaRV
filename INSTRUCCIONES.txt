@@ -1,0 +1,253 @@
+================================================================================
+INSTRUCCIONES DE USO - PRÁCTICA DE ARBITRAJE
+================================================================================
+
+ARCHIVOS DEL PROYECTO:
+----------------------
+- PracticaRV.py          → Script principal (EJECUTAR ESTE)
+- utilities.py           → Funciones auxiliares (NO MODIFICAR)
+- requirements.txt       → Dependencias Python
+- README.md             → Documentación completa
+- run_all_isins.py      → Script para ejecutar con todos los ISINs
+- INSTRUCCIONES.txt     → Este archivo
+
+================================================================================
+INSTALACIÓN (SOLO LA PRIMERA VEZ)
+================================================================================
+
+1. Crear entorno virtual:
+   python -m venv .venv
+
+2. Activar entorno virtual:
+   Windows:  .venv\Scripts\activate
+   Linux/Mac: source .venv/bin/activate
+
+3. Instalar dependencias:
+   pip install -r requirements.txt
+
+================================================================================
+EJECUCIÓN
+================================================================================
+
+OPCIÓN 1: Ejecutar con 5 ISINs seleccionados (RÁPIDO - 40 segundos)
+--------------------------------------------------------------------
+   python PracticaRV.py
+
+   Esto procesará solo 5 ISINs principales:
+   - Banco Santander
+   - Inditex
+   - Telefónica
+   - Iberdrola
+   - BBVA
+
+
+OPCIÓN 2: Ejecutar con TODOS los ISINs (COMPLETO - 8-10 minutos)
+-----------------------------------------------------------------
+   Método A - Usando el script auxiliar:
+      python run_all_isins.py
+
+   Método B - Editando manualmente:
+      1. Abrir PracticaRV.py
+      2. Cambiar línea 31: USE_ALL_ISINS = False  →  USE_ALL_ISINS = True
+      3. Guardar y ejecutar: python PracticaRV.py
+
+   Esto procesará los 64 ISINs disponibles en las 4 venues.
+
+================================================================================
+ARCHIVOS GENERADOS
+================================================================================
+
+Después de ejecutar, se generarán:
+
+TABLAS CSV:
+-----------
+1. money_table.csv
+   → Tabla con profit por ISIN y nivel de latencia
+
+2. venue_pairs_analysis.csv
+   → Análisis detallado de pares de venues (dirección, oportunidades, profit)
+
+GRÁFICOS:
+---------
+3. decay_chart_total.png
+   → Gráfico principal: profit total vs latencia
+
+4. decay_chart_by_isin.png
+   → Gráfico: profit por ISIN (top 10 más rentables)
+
+5. profit_distribution.png
+   → Histogramas de distribución de profits a 0μs, 1ms y 10ms
+
+6. venue_pairs_heatmap.png
+   → Heatmaps de profit y oportunidades por pares de venues
+
+7. venue_pairs_top10.png
+   → Top 10 pares más rentables y con más oportunidades
+
+================================================================================
+CONFIGURACIÓN AVANZADA
+================================================================================
+
+Puedes modificar estos parámetros en PracticaRV.py:
+
+- USE_ALL_ISINS (línea 31)
+  False = Solo 5 ISINs seleccionados
+  True = Todos los ISINs disponibles (64)
+
+- MAX_ISINS_TO_PLOT (línea 43)
+  Número máximo de ISINs a mostrar en gráficos individuales
+  Por defecto: 10
+
+- LATENCY_LEVELS (línea 54)
+  Niveles de latencia a simular en microsegundos
+  Por defecto: [0, 100, 500, 1000, 2000, 3000, 4000, 5000, 
+                10000, 15000, 20000, 30000, 50000, 100000]
+
+- DATA_FOLDER (línea 58)
+  Carpeta con los datos de mercado
+  Por defecto: 'DATA_BIG'
+
+================================================================================
+TIEMPOS DE EJECUCIÓN ESTIMADOS
+================================================================================
+
+Hardware de referencia: CPU moderna, 8GB RAM
+
+- 5 ISINs:    ~40 segundos
+- 10 ISINs:   ~1.5 minutos
+- 30 ISINs:   ~4 minutos
+- 64 ISINs:   ~8-10 minutos
+
+================================================================================
+TROUBLESHOOTING
+================================================================================
+
+Error: "No module named 'pandas'"
+→ Solución: pip install -r requirements.txt
+
+Error: "DATA_BIG folder not found"
+→ Solución: Asegúrate de que la carpeta DATA_BIG está en el mismo directorio
+
+Error: "MemoryError"
+→ Solución: Reduce el número de ISINs procesados
+
+El script se queda colgado en Step 4
+→ Esto es normal, Step 4 puede tardar varios minutos con muchos ISINs
+→ Verifica que utilities.py tiene la versión optimizada de simulate_latency
+
+================================================================================
+INTERPRETACIÓN DE RESULTADOS
+================================================================================
+
+MONEY TABLE:
+- Muestra el profit realizado a cada nivel de latencia
+- Busca el "decay" (decaimiento) del profit con latencia creciente
+- Un decay alto indica que las oportunidades son muy breves
+
+TOP 5 ISINs:
+- ISINs más rentables a 0 latencia
+- "Unique Trades" = número de oportunidades detectadas
+- "Avg Profit/Trade" = profit promedio por oportunidad
+
+VENUE PAIRS ANALYSIS (NUEVO):
+- venue_pairs_analysis.csv contiene análisis detallado de pares
+- Formato direccional: A→B significa "vender en A, comprar en B"
+- Columnas clave:
+  * opportunities: Número de veces que aparece ese par
+  * total_profit: Suma de profits de ese par
+  * avg_profit: Profit promedio por oportunidad
+  * avg_spread: Diferencia de precio media
+  * avg_quantity: Volumen disponible medio
+
+INTERPRETACIÓN DE PARES:
+- Si CBOE→BME tiene más profit que BME→CBOE:
+  → CBOE tiende a tener mejores precios de venta (bid)
+  → BME tiende a tener mejores precios de compra (ask)
+- Pares con más oportunidades = mayor desincronización
+- Útil para optimizar estrategias de routing de órdenes
+
+SANITY CHECK:
+- ✓ = Resultados razonables
+- ⚠ = Posible anomalía en los datos
+
+GRÁFICOS:
+- decay_chart_total.png: Muestra cómo decae el profit total
+- decay_chart_by_isin.png: Compara el decay entre ISINs
+- profit_distribution.png: Muestra la distribución estadística
+- venue_pairs_heatmap.png: Matrices de profit y oportunidades por pares
+  * Filas = Venue de venta (max bid)
+  * Columnas = Venue de compra (min ask)
+  * Diagonal = Siempre 0 (no se puede arbitrar en el mismo venue)
+- venue_pairs_top10.png: Rankings de pares más rentables
+
+================================================================================
+PARA LA ENTREGA FINAL
+================================================================================
+
+1. Ejecutar con TODOS los ISINs:
+   python run_all_isins.py
+
+2. Archivos a entregar:
+   - PracticaRV.py
+   - utilities.py
+   - money_table.csv
+   - venue_pairs_analysis.csv
+   - decay_chart_total.png
+   - decay_chart_by_isin.png
+   - profit_distribution.png
+   - venue_pairs_heatmap.png
+   - venue_pairs_top10.png
+   - README.md (opcional pero recomendado)
+
+3. En el informe, incluir:
+   - Money Table completa
+   - Análisis de pares de venues (venue_pairs_analysis.csv)
+   - Gráficos generados
+   - Análisis del decay de profit con latencia
+   - Top 5 ISINs más rentables
+   - Top 10 pares de venues más rentables
+   - Conclusiones sobre:
+     * Importancia de la baja latencia
+     * Qué pares de venues son más rentables
+     * Direccionalidad del arbitraje (A→B vs B→A)
+
+================================================================================
+EJEMPLO DE RESULTADOS (5 ISINs)
+================================================================================
+
+MONEY TABLE (Extracto):
+                ISIN            Name     0μs  1000μs 10000μs
+    ES0113211835         Inditex €383.37 €345.31 €248.25
+    ES0113900J37 Banco Santander €212.88 €193.28  €95.09
+           TOTAL       All ISINs €661.07 €628.54 €381.57
+
+DECAY ANALYSIS:
+- Decay a 1ms: 5.0% (de €661 a €629)
+- Decay a 10ms: 42.3% (de €661 a €382)
+→ Conclusión: La latencia es CRÍTICA en arbitraje HFT
+
+TOP 5 PARES DE VENUES MÁS RENTABLES:
+1. CBOE→BME: €250.03 (111 oportunidades, €2.25/opp)
+2. BME→CBOE: €223.00 (59 oportunidades, €3.78/opp)
+3. AQUIS→BME: €82.86 (92 oportunidades, €0.90/opp)
+4. BME→AQUIS: €62.66 (85 oportunidades, €0.74/opp)
+5. TURQUOISE→BME: €36.68 (49 oportunidades, €0.75/opp)
+
+INSIGHTS:
+- BME-CBOE es el par más activo (bidireccional)
+- CBOE→BME tiene casi el doble de oportunidades que BME→CBOE
+- BME aparece frecuentemente como venue de compra (min ask)
+- TURQUOISE tiene menos actividad pero oportunidades rentables
+
+INTERPRETACIÓN PRÁCTICA:
+Si eres market maker:
+→ Coloca bids agresivos en CBOE (venue de venta frecuente)
+→ Coloca asks agresivos en BME (venue de compra frecuente)
+→ Monitorea CBOE→BME como par prioritario
+
+Si optimizas routing:
+→ Prioriza CBOE para órdenes de venta
+→ Prioriza BME para órdenes de compra
+→ Evita TURQUOISE para arbitraje de alta frecuencia
+
+================================================================================

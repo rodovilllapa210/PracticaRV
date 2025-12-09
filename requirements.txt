@@ -1,0 +1,12 @@
+# Requirements for Práctica de Arbitraje en Mercados Financieros
+# Python 3.8+
+
+# Core data processing
+pandas>=2.0.0
+numpy>=1.23.0
+
+# Visualization
+matplotlib>=3.7.0
+
+# Optional but recommended for better performance
+# numba>=0.57.0  # Uncomment for JIT compilation speedups
