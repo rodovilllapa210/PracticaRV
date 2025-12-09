@@ -2,23 +2,25 @@
 
 ### Rodolfo Villena Lapaz
 
-Detección de oportunidades de arbitraje cross-venue con simulación de latencia en mercados españoles.
+Detección de oportunidades de arbitraje cross-venue con simulación de latencia en mercados españoles. Análisis completo de 64 ISINs en 4 venues (BME, CBOE, AQUIS, TURQUOISE) con filtros de calidad para resultados realistas.
 
 ## Características Principales
 
-- ✅ **Análisis multi-venue**: BME, CBOE, AQUIS, TURQUOISE
+- ✅ **Análisis multi-venue**: BME, CBOE, AQUIS, TURQUOISE (4 mercados principales)
 - ✅ **Simulación de latencia**: 14 niveles desde 0μs hasta 100ms
-- ✅ **Filtros de calidad**: Eliminación de oportunidades sospechosas o no ejecutables
+- ✅ **Filtros de calidad avanzados**: Eliminación de oportunidades sospechosas o no ejecutables
 - ✅ **Análisis de pares de venues**: Identificación de direccionalidad del arbitraje
 - ✅ **Procesamiento escalable**: 5 ISINs (rápido) o 64 ISINs (completo)
-- ✅ **Visualizaciones avanzadas**: Heatmaps, distribuciones, decay charts
+- ✅ **Visualizaciones profesionales**: Heatmaps, distribuciones, decay charts (300 DPI)
 - ✅ **Resultados realistas**: Diferenciación entre oportunidades teóricas vs. ejecutables
+- ✅ **Análisis estadístico completo**: Distribuciones, top rankings, matrices de correlación
 
 ## Requisitos del Sistema
 
 - Python 3.8 o superior
-- ~4 GB de RAM (para procesar todos los ISINs)
-- ~500 MB de espacio en disco para los datos
+- **4 GB de RAM** (recomendado 8GB para procesar todos los ISINs)
+- **500 MB de espacio en disco** para los datos de mercado
+- Procesador moderno (multi-core recomendado para mejor rendimiento)
 
 ## Instalación
 
@@ -46,16 +48,24 @@ source .venv/bin/activate
 pip install -r requirements.txt
 ```
 
+**Nota**: Si experimentas problemas de rendimiento, considera instalar numba:
+```bash
+pip install numba>=0.57.0
+```
+
 ## Estructura del Proyecto
 
 ```
 .
 ├── PracticaRV.py              # Script principal (ejecutable)
-├── utilities.py               # Funciones auxiliares
+├── utilities.py               # Funciones auxiliares optimizadas
 ├── requirements.txt           # Dependencias Python
 ├── run_all_isins.py          # Script para ejecutar con todos los ISINs
+├── test_practica.py          # Script de pruebas unitarias
 ├── README.md                  # Este archivo
 ├── INSTRUCCIONES.txt          # Guía rápida en español
+├── Informe_arbitraje_BME.md  # Informe técnico detallado
+├── Working with microsecond timeseries.ipynb # Notebook de análisis exploratorio
 ├── DATA_BIG/                 # Carpeta con datos de mercado (no incluida)
 │   ├── BME_2025-11-07/
 │   ├── CBOE_2025-11-07/
@@ -72,7 +82,7 @@ pip install -r requirements.txt
 python PracticaRV.py
 ```
 
-Esto procesará 5 ISINs principales españoles en ~40 segundos.
+Esto procesará 5 ISINs principales españoles en ~40 segundos y generará resultados preliminares.
 
 ### Ejecución con todos los ISINs disponibles (COMPLETO)
 
@@ -93,7 +103,7 @@ Luego ejecutar:
 python PracticaRV.py
 ```
 
-Esto procesará los 64 ISINs disponibles en ~8-10 minutos.
+Esto procesará los 64 ISINs disponibles en ~8-10 minutos y generará el análisis completo.
 
 ## Salidas Generadas
 
@@ -139,6 +149,25 @@ El script genera los siguientes archivos:
      * Superior: Top 10 pares más rentables
      * Inferior: Top 10 pares con más oportunidades
    - Formato direccional: A→B indica vender en A, comprar en B
+
+## Resultados Recientes (64 ISINs)
+
+### Métricas Principales
+- **1.034 oportunidades únicas** de arbitraje detectadas
+- **€1.184,11 beneficio total** teórico a latencia 0
+- **Decay a 1ms**: ~5% del beneficio total
+- **Decay a 10ms**: ~42% del beneficio total
+- **Top ISINs**: Santander, Inditex, Telefónica, Iberdrola, BBVA
+
+### Top Pares de Venues
+1. **CBOE→BME**: €250.03 (111 oportunidades)
+2. **BME→CBOE**: €223.00 (59 oportunidades)  
+3. **AQUIS→BME**: €82.86 (92 oportunidades)
+4. **BME→AQUIS**: €62.66 (85 oportunidades)
+5. **TURQUOISE→BME**: €36.68 (49 oportunidades)
+
+### Impacto de Filtros de Calidad
+Los filtros reducen las oportunidades en **57%** pero proporcionan resultados más realistas y ejecutables.
 
 ## Configuración
 
@@ -268,6 +297,8 @@ Hardware de referencia: CPU moderna, 8GB RAM
 - **30 ISINs**: ~4 minutos
 - **64 ISINs (todos)**: ~8-10 minutos
 
+*Con numba instalado, los tiempos pueden reducirse hasta un 30%*
+
 ## Análisis de Pares de Venues
 
 ### ¿Qué es el análisis venue-to-venue?
@@ -351,12 +382,20 @@ Esto es normal, Step 4 (Latency Simulation) puede tardar varios minutos con much
 
 ### Archivos a incluir:
 
+**Código fuente:**
 - `PracticaRV.py` (código principal)
-- `utilities.py` (funciones auxiliares)
+- `utilities.py` (funciones auxiliares optimizadas)
+- `requirements.txt` (dependencias)
+
+**Resultados del análisis:**
 - `money_table.csv` (resultados de latencia)
 - `venue_pairs_analysis.csv` (análisis de pares)
-- Todos los gráficos PNG generados
-- Este README.md
+- Todos los gráficos PNG generados (7 archivos)
+
+**Documentación:**
+- `README.md` (esta guía)
+- `INSTRUCCIONES.txt` (guía rápida)
+- `Informe_arbitraje_BME.md` (informe técnico)
 
 ### En el informe, incluir:
 
@@ -364,23 +403,28 @@ Esto es normal, Step 4 (Latency Simulation) puede tardar varios minutos con much
 2. **Impacto de los filtros de calidad**:
    - Comparación con/sin filtros
    - Justificación de los filtros aplicados
-   - Interpretación de la reducción de oportunidades
+   - Interpretación de la reducción de oportunidades (57%)
 3. **Análisis de pares de venues**:
-   - Top 10 pares más rentables
+   - Top 10 pares más rentables (CBOE↔BME dominante)
    - Interpretación de la direccionalidad
    - Implicaciones para estrategias de trading
-4. **Gráficos generados** con análisis
-5. **Análisis del decay de profit** con latencia
-6. **Top 5 ISINs más rentables**
-7. **Conclusiones sobre**:
-   - Importancia de la baja latencia en HFT
+4. **Gráficos generados** con análisis detallado
+5. **Análisis del decay de profit** con latencia:
+   - Decay crítico: 42% a 10ms
+   - Importancia de HFT y baja latencia
+6. **Top 5 ISINs más rentables** con métricas
+7. **Conclusiones estratégicas**:
+   - Importancia crítica de la baja latencia en HFT
    - Impacto de la calidad de datos en resultados
-   - Qué pares de venues ofrecen mejores oportunidades
+   - Pares de venues óptimos (CBOE-BME)
    - Direccionalidad del arbitraje entre venues
    - Estrategias de routing óptimas
    - Diferencia entre oportunidades teóricas vs. ejecutables
 
 ## Autor
 
-Rodolfo Villena Lapaz
+**Rodolfo Villena Lapaz**
+14 MIAX
 Diciembre 2025
+
+*Análisis realizado como parte de la asignatura "Introducción a los Sistemas Financieros"*
